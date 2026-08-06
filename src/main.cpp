@@ -39,13 +39,16 @@ int main() {
         return "VectorGuesser backend is running!";
     });
 
-    CROW_ROUTE(app, "/get_city_by_name/<string>").methods(
-        crow::HTTPMethod::GET)([&db](const crow::request &req, const std::string &name){
-        std::string name_ = name;
-        std::replace(name_.begin(), name_.end(), '_', ' '); 
-        auto city_opt = db.get_city_by_name(name_);
+    CROW_ROUTE(app, "/get_city_by_name/").methods(
+        crow::HTTPMethod::GET)([&db](const crow::request &req){
+        auto name_ = req.url_params.get("name");
+        if (!name_) {
+            return crow::response(400, "Missing 'name' parameter");
+        }
+        std::string name(name_);
+        auto city_opt = db.get_city_by_name(name);
         if(!city_opt.has_value()) {
-            return crow::response(404, "City " + name_ + " not found in database");
+            return crow::response(404, "City " + name + " not found in database");
         }
         auto &city_ = city_opt.value();
         crow::json::wvalue json_res;
@@ -69,13 +72,16 @@ int main() {
         return crow::response(json_res);
     });
 
-    CROW_ROUTE(app, "/get_vector/<string>/<string>").methods(
-        crow::HTTPMethod::GET)([&db](const crow::request &req, const std::string &from, const std::string &to){
-        std::string from_ = from;
-        std::replace(from_.begin(), from_.end(), '_', ' '); 
-        std::string to_ = to; 
-        std::replace(to_.begin(), to_.end(), '_', ' '); 
-        db_manager::vector_geo vec = db.count_vector(from_, to_); 
+    CROW_ROUTE(app, "/get_vector/").methods(
+        crow::HTTPMethod::GET)([&db](const crow::request &req){
+        auto from_ = req.url_params.get("from");
+        auto to_ = req.url_params.get("to");
+        if (!from_ || !to_) {
+            return crow::response(400, "Missing 'from' or 'to' parameters");
+        }
+        std::string from(from_);
+        std::string to(to_);
+        db_manager::vector_geo vec = db.count_vector(from, to); 
         crow::json::wvalue json_res;
         json_res["distance_km"] = vec.distance_km; 
         json_res["angle_deg"] = vec.angle_deg; 
