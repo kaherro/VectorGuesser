@@ -25,7 +25,7 @@ public:
         double distance_km;
         double angle_deg; 
     };
-    const vector_geo count_vector(const city &from, const city &to);
+    const vector_geo count_vector(const std::string &from_str, const std::string &to_str);
 
 private:
     struct sqlite3_deleter {
@@ -35,7 +35,6 @@ private:
     };
     std::unique_ptr<sqlite3, sqlite3_deleter> db;
     void load_all_cities();
-    // void exec(const char *sql); 
     std::unordered_map<std::string, city> name_to_city; 
     std::vector<city> cities; 
 };
