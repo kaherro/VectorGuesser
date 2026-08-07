@@ -3,6 +3,11 @@
 #include <db_manager.h>
 #include <cmath> 
 #include <algorithm>
+#include <mutex>
+#include <random>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 static inline std::string round_to_4(double x) {
     std::string s = std::to_string(x); 
@@ -36,6 +41,20 @@ std::string new_session_id() {
     return std::to_string(distrib(gen)); 
 }
 
+std::string readFile(const std::string& basePath, const std::string& requestedPath) {
+    if (requestedPath.find("..") != std::string::npos) {
+        return "";
+    }
+    std::string fullPath = basePath + "/" + requestedPath;
+    std::ifstream file(fullPath, std::ios::in | std::ios::binary);
+    if (!file) {
+        return "";
+    }
+    std::ostringstream contents;
+    contents << file.rdbuf();
+    return contents.str();
+}
+
 int main() {
     std::unique_ptr<db_manager> db_ptr;
     try {
@@ -48,31 +67,17 @@ int main() {
     db_manager &db = *db_ptr;
 
     crow::SimpleApp app;
-    CROW_ROUTE(app, "/")
-    ([](){
-        return "VectorGuesser backend is running!";
-    });
 
-    // CROW_ROUTE(app, "/get_city_by_name/").methods(
-    //     crow::HTTPMethod::GET)([&db](const crow::request &req){
-    //     auto name_ = req.url_params.get("name");
-    //     if (!name_) {
-    //         return crow::response(400, "Missing 'name' parameter");
-    //     }
-    //     std::string name(name_);
-    //     auto city_opt = db.get_city_by_name(name);
-    //     if(!city_opt.has_value()) {
-    //         return crow::response(404, "City " + name + " not found in database");
-    //     }
-    //     auto &city_ = city_opt.value();
-    //     crow::json::wvalue json_res;
-    //     json_res["id"] = city_.id;
-    //     json_res["name"] = city_.name;
-    //     json_res["latitude"] = round_to_4(city_.latitude);
-    //     json_res["longitude"] = round_to_4(city_.longitude);
-    //     json_res["country"] = city_.country;
-    //     return crow::response(json_res);
-    // });
+    CROW_ROUTE(app, "/<string>")
+    ([](const crow::request& req, std::string path){
+        if (path.empty()) path = "index.html";
+        std::string content = readFile("../web", path);
+        if (!content.empty()) {
+            crow::response res(content);
+            return res;
+        }
+        return crow::response(404);
+    });
 
     CROW_ROUTE(app, "/api/start").methods(
     crow::HTTPMethod::GET)([&db](const crow::request &req){
@@ -90,9 +95,10 @@ int main() {
             {
                 std::lock_guard<std::mutex> lock(sessions_mutex);
                 sessions[session_id].target = city_to;
+                json_res["attempts_left"] = sessions[session_id].attempts_left;
             }
             auto vec = db.count_vector(city_from.name, city_to.name);
-            json_res["vector"]["distance_km"] = vec.distance_km; 
+            json_res["vector"]["distance_km"] = int(vec.distance_km); 
             json_res["vector"]["angle_deg"] = vec.angle_deg; 
             return crow::response(json_res);
         }
@@ -106,14 +112,14 @@ int main() {
         auto from_ = req.url_params.get("from");
         auto session_id_ = req.url_params.get("session_id");
         if (!from_ || !session_id_) {
-            return crow::response(400, "Missing 'from' or 'session_id' parameters");
+            return crow::response(400, crow::json::wvalue{{"error", "Missing 'from' or 'session_id' parameters"}});
         }
         try {
             std::string from(from_);
             std::string session_id(session_id_);
             std::lock_guard<std::mutex> lock(sessions_mutex);
             if(!sessions.contains(session_id)) {
-                return crow::response(404, "Session " + session_id + " doesn't exist or was terminated");
+                return crow::response(404, crow::json::wvalue{{"error", "Session " + session_id + " doesn't exist or was terminated"}});
             }
             std::string to(sessions[session_id].target.name); 
             std::transform(from.begin(), from.end(), from.begin(), ::tolower); 
@@ -128,8 +134,23 @@ int main() {
             }
             db_manager::vector_geo vec = db.count_vector(from, to); 
             crow::json::wvalue json_res;
-            json_res["vector"]["distance_km"] = vec.distance_km; 
+
+            auto city_opt = db.get_city_by_name(from);
+            if(!city_opt.has_value()) {
+                throw std::runtime_error(
+                    "City " + from + " not found"
+                );
+            }
+            city &city_from = city_opt.value(); 
+            json_res["city"]["id"] = city_from.id;
+            json_res["city"]["name"] = city_from.name;
+            json_res["city"]["latitude"] = round_to_4(city_from.latitude);
+            json_res["city"]["longitude"] = round_to_4(city_from.longitude);
+            json_res["city"]["country"] = city_from.country;
+
+            json_res["vector"]["distance_km"] = int(vec.distance_km); 
             json_res["vector"]["angle_deg"] = vec.angle_deg; 
+            json_res["attempts_left"] = sessions[session_id].attempts_left;
             return crow::response(json_res);
         }
         catch (const std::exception &e) {
@@ -142,11 +163,14 @@ int main() {
         try {    
             auto session_id_ = req.url_params.get("session_id");
             if (!session_id_) {
-                return crow::response(400, "Missing 'session_id' parameter");
+            return crow::response(400, crow::json::wvalue{{"error", "Missing session_id' parameter"}});
             }
             std::string session_id = session_id_; 
-            if(!sessions.contains(session_id)) {
-                return crow::response(404, "Session " + session_id + " doesn't exist or was terminated");
+            {
+                std::lock_guard<std::mutex> lock(sessions_mutex);
+                if(!sessions.contains(session_id)) {
+                    return crow::response(404, crow::json::wvalue{{"error", "Session " + session_id + " doesn't exist or was terminated"}});
+                }
             }
             auto city_from = db.get_random_city();
             crow::json::wvalue json_res;
@@ -160,6 +184,7 @@ int main() {
             {
                 std::lock_guard<std::mutex> lock(sessions_mutex);
                 sessions[session_id].target = city_to;
+                json_res["attempts_left"] = sessions[session_id].attempts_left;
             }
             auto vec = db.count_vector(city_from.name, city_to.name);
             json_res["vector"]["distance_km"] = vec.distance_km; 
@@ -170,22 +195,6 @@ int main() {
             return crow::response(500, crow::json::wvalue{{"error", e.what()}});
         }
     });
-
-    // CROW_ROUTE(app, "/get_vector/").methods(
-    //     crow::HTTPMethod::GET)([&db](const crow::request &req){
-    //     auto from_ = req.url_params.get("from");
-    //     auto to_ = req.url_params.get("to");
-    //     if (!from_ || !to_) {
-    //         return crow::response(400, "Missing 'from' or 'to' parameters");
-    //     }
-    //     std::string from(from_);
-    //     std::string to(to_);
-    //     db_manager::vector_geo vec = db.count_vector(from, to); 
-    //     crow::json::wvalue json_res;
-    //     json_res["distance_km"] = vec.distance_km; 
-    //     json_res["angle_deg"] = vec.angle_deg; 
-    //     return crow::response(json_res);
-    // });
 
     std::cout << "Server listening on http://0.0.0.0:18080\n";
     app.port(18080).multithreaded().run();
