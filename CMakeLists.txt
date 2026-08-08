@@ -19,6 +19,7 @@ FetchContent_Declare(
     asio
     GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
     GIT_TAG asio-1-30-2
+    GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(asio)
 set(ASIO_INCLUDE_DIR ${asio_SOURCE_DIR}/asio/include CACHE PATH "Asio include dir" FORCE)
@@ -27,6 +28,7 @@ FetchContent_Declare(
     Crow
     GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
     GIT_TAG master
+    GIT_SHALLOW TRUE
 )
 
 set(CROW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
