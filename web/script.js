@@ -37,6 +37,7 @@ function add_city_marker(city, angle = 0, distance = 0) {
         .addTo(map)
         .bindTooltip(city.name + '<br>' + distance + ' km', {permanent: true, direction: 'top'})
         .openTooltip();
+    map.setView([parseFloat(city.latitude), parseFloat(city.longitude)], 4);
     markers.push(marker); 
     return marker;
 }
@@ -65,11 +66,10 @@ async function load_start_city() {
         start_city_name = data.city.name;
         session_id = data.session_id;
         attempts_left = data.attempts_left ?? 5;
-        current_distance = data.vector.distance_km ?? 0;
+        current_distance = data.vector.distance_km;
         document.getElementById('start-city').textContent = start_city_name;
         document.getElementById('vector-info').textContent =
             `${parseFloat(data.vector.distance_km).toFixed(0)} km @ ${parseFloat(data.vector.angle_deg).toFixed(0)}°`;
-        map.setView([parseFloat(data.city.latitude), parseFloat(data.city.longitude)], 4);
         document.getElementById('cities-guessed').textContent = 0;
         document.getElementById('score').textContent = 0;
         start_marker = true; 
@@ -97,7 +97,6 @@ async function load_next_round() {
         document.getElementById('start-city').textContent = start_city_name;
         document.getElementById('vector-info').textContent =
             `${parseFloat(data.vector.distance_km).toFixed(1)} km @ ${parseFloat(data.vector.angle_deg).toFixed(0)}°`;
-        map.setView([parseFloat(data.city.latitude), parseFloat(data.city.longitude)], 4);
         add_city_marker(data.city, data.vector.angle_deg, data.vector.distance_km);
         update_UI();
         document.getElementById('guess-input').value = '';
@@ -156,7 +155,7 @@ async function make_guess() {
 
         add_city_marker(data.city, data.vector.angle_deg, data.vector.distance_km);
         attempts_left = data.attempts_left ?? attempts_left;
-        current_distance = data.vector.distance_km ?? 0;
+        current_distance = data.vector.distance_km;
         update_UI();
         const msg_el = document.getElementById('message');
         msg_el.textContent = `Wrong. ${parseFloat(data.vector.distance_km).toFixed(0)} km @ ${parseFloat(data.vector.angle_deg).toFixed(0)}°`;
