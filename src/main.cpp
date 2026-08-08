@@ -92,6 +92,9 @@ int main() {
             std::string session_id = new_session_id(); 
             json_res["session_id"] = session_id; 
             auto city_to = db.get_random_city(); 
+            while(city_from.name == city_to.name) {
+                city_to = db.get_random_city(); 
+            }
             {
                 std::lock_guard<std::mutex> lock(sessions_mutex);
                 sessions[session_id].target = city_to;
@@ -185,6 +188,9 @@ int main() {
             json_res["city"]["country"] = city_from.country;
             json_res["session_id"] = session_id; 
             auto city_to = db.get_random_city(); 
+            while(city_from.name == city_to.name) {
+                city_to = db.get_random_city(); 
+            }
             {
                 std::lock_guard<std::mutex> lock(sessions_mutex);
                 sessions[session_id].target = city_to;
