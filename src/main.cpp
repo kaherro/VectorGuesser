@@ -29,7 +29,7 @@ static inline std::string round_to_4(double x) {
 
 struct session {
     city target; 
-    int attempts_left = 5; 
+    int attempts_left = 10; 
 };
 std::mutex sessions_mutex;
 std::unordered_map<std::string, session> sessions; 
