@@ -58,7 +58,7 @@ std::string readFile(const std::string& basePath, const std::string& requestedPa
 int main() {
     std::unique_ptr<db_manager> db_ptr;
     try {
-        db_ptr = std::make_unique<db_manager>("cities.db");
+        db_ptr = std::make_unique<db_manager>("../data/cities.db");
     } 
     catch (const std::exception &e) {
         std::cerr << "Failed to initialize database: " << e.what() << '\n';
