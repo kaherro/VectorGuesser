@@ -187,7 +187,7 @@ int main() {
                 json_res["attempts_left"] = sessions[session_id].attempts_left;
             }
             auto vec = db.count_vector(city_from.name, city_to.name);
-            json_res["vector"]["distance_km"] = vec.distance_km; 
+            json_res["vector"]["distance_km"] = int(vec.distance_km); 
             json_res["vector"]["angle_deg"] = vec.angle_deg; 
             return crow::response(json_res);
         }
