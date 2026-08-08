@@ -100,17 +100,20 @@ const db_manager::vector_geo db_manager::count_vector(const std::string &from_st
     double lat2 = deg_to_rad(to.latitude);
     double lon1 = deg_to_rad(from.longitude);
     double lon2 = deg_to_rad(to.longitude);
-
     double dlon = lon2 - lon1; 
-    double y = std::sin(dlon) * std::cos(lat2);
-    double x = std::cos(lat1) * std::sin(lat2) - std::sin(lat1) * std::cos(lat2) * std::cos(dlon);
-    double angle = rad_to_deg(std::atan2(y, x));
-    if(angle < 0.0) angle += 360.0;
-
+    while (dlon > M_PI) dlon -= 2.0 * M_PI;
+    while (dlon < -M_PI) dlon += 2.0 * M_PI;
+    double y1 = std::log(std::tan(M_PI / 4.0 + lat1 / 2.0));
+    double y2 = std::log(std::tan(M_PI / 4.0 + lat2 / 2.0));
+    double dy = y2 - y1;
+    double dx = dlon; 
+    double angle = rad_to_deg(std::atan2(dx, dy));
+    if (angle < 0.0) angle += 360.0;
     double haversine = std::sin((lat2 - lat1) / 2) * std::sin((lat2 - lat1) / 2) + 
                     std::cos(lat1) * std::cos(lat2) * std::sin(dlon / 2) * std::sin(dlon / 2);
     double distance = 2.0 * 6371.0 * std::asin(std::sqrt(haversine));
+
     log("INFO", "Distance between " + from_str + " and " + to_str + " is " + 
-        std::to_string(distance) + ", angle is " + std::to_string(angle)); 
+        std::to_string(distance) + ", Mercator angle is " + std::to_string(angle)); 
     return {distance, angle};
 }
