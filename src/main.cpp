@@ -158,7 +158,7 @@ int main() {
         }
     });
 
-    CROW_ROUTE(app, "/api/next_roud").methods(
+    CROW_ROUTE(app, "/api/next_round").methods(
     crow::HTTPMethod::GET)([&db](const crow::request &req){
         try {    
             auto session_id_ = req.url_params.get("session_id");
