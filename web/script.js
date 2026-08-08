@@ -167,7 +167,12 @@ async function make_guess() {
         guess_input.value = '';
     } catch (err) {
         console.error('Guess failed:', err);
-        document.getElementById('message').textContent = 'Error contacting server';
+        if(err == 'Error: HTTP 404') {
+            document.getElementById('message').textContent = 'City not found';
+        }
+        else {
+            document.getElementById('message').textContent = 'Error contacting server';
+        }
         document.getElementById('message').className = 'error';
     }
 }
