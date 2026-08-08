@@ -116,6 +116,10 @@ int main() {
         }
         try {
             std::string from(from_);
+            auto from_opt = db.get_city_by_name(from); 
+            if(!from_opt.has_value()) {
+                return crow::response(404, crow::json::wvalue{{"error", "City " + from + " not found"}});
+            }
             std::string session_id(session_id_);
             std::lock_guard<std::mutex> lock(sessions_mutex);
             if(!sessions.contains(session_id)) {
@@ -158,7 +162,7 @@ int main() {
         }
     });
 
-    CROW_ROUTE(app, "/api/next_roud").methods(
+    CROW_ROUTE(app, "/api/next_round").methods(
     crow::HTTPMethod::GET)([&db](const crow::request &req){
         try {    
             auto session_id_ = req.url_params.get("session_id");
