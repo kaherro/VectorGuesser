@@ -156,7 +156,7 @@ async function make_guess() {
 
         add_city_marker(data.city, data.vector.angle_deg, data.vector.distance_km);
         attempts_left = data.attempts_left ?? attempts_left;
-        current_distance = data.vector.distance_km ?? current_distance;
+        current_distance = data.vector.distance_km ?? 0;
         update_UI();
         const msg_el = document.getElementById('message');
         msg_el.textContent = `Wrong. ${parseFloat(data.vector.distance_km).toFixed(0)} km @ ${parseFloat(data.vector.angle_deg).toFixed(0)}°`;
