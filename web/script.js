@@ -4,7 +4,9 @@ let markers = [];
 let session_id = null;
 let start_city_name = '';
 let attempts_left = 5;
-// let guess_correct = false;
+let current_distance = 0;
+let guessed_counter = 0;
+let score = 0; 
 
 function init_map() {
     map = L.map('map').setView([20, 0], 2); 
@@ -63,10 +65,13 @@ async function load_start_city() {
         start_city_name = data.city.name;
         session_id = data.session_id;
         attempts_left = data.attempts_left ?? 5;
+        current_distance = data.vector.distance_km ?? 0;
         document.getElementById('start-city').textContent = start_city_name;
         document.getElementById('vector-info').textContent =
             `${parseFloat(data.vector.distance_km).toFixed(0)} km @ ${parseFloat(data.vector.angle_deg).toFixed(0)}°`;
         map.setView([parseFloat(data.city.latitude), parseFloat(data.city.longitude)], 4);
+        document.getElementById('cities-guessed').textContent = 0;
+        document.getElementById('score').textContent = 0;
         start_marker = true; 
         add_city_marker(data.city, data.vector.angle_deg, data.vector.distance_km);
         update_UI();
@@ -120,12 +125,16 @@ async function make_guess() {
         const resp = await fetch(`/api/guess?from=${encodeURIComponent(guess)}&session_id=${encodeURIComponent(session_id)}`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const raw_text = await resp.text();
+
         if (raw_text === 'Correct') {
             const msg_el = document.getElementById('message');
             msg_el.textContent = 'Correct!';
             msg_el.className = 'correct';
             guess_input.value = '';
             start_marker = true; 
+            document.getElementById('cities-guessed').textContent = ++guessed_counter;
+            score += current_distance;
+            document.getElementById('score').textContent = score;
             await load_next_round();
             return;
         }
@@ -147,6 +156,7 @@ async function make_guess() {
 
         add_city_marker(data.city, data.vector.angle_deg, data.vector.distance_km);
         attempts_left = data.attempts_left ?? attempts_left;
+        current_distance = data.vector.distance_km ?? current_distance;
         update_UI();
         const msg_el = document.getElementById('message');
         msg_el.textContent = `Wrong. ${parseFloat(data.vector.distance_km).toFixed(0)} km @ ${parseFloat(data.vector.angle_deg).toFixed(0)}°`;
