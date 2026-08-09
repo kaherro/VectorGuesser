@@ -10,8 +10,8 @@ let score = 0;
 
 function init_map() {
     map = L.map('map').setView([20, 0], 2); 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);
 }
 
