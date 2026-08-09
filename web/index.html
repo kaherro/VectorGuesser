@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Vector Guesser</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -13,17 +14,22 @@
 <div id="container">
     <h1>Vector Guesser</h1>
     <div id="status">
-        <p>Start city: <span id="start-city">Loading...</span></p>
-        <p>Vector: <span id="vector-info">Loading...</span></p>
-        <p>Attempts left: <span id="attempts">5</span></p>
+        <p>Start city: <span id="start-city">-</span></p>
+        <p>Vector: <span id="vector-info">-</span></p>
+        <p>Attempts left: <span id="attempts">10</span></p>
         <p>Cities guessed: <span id="cities-guessed">0</span></p>
         <p>Score: <span id="score">0</span></p>
-        <p id="message"></p>
+        <p>Difficulty: <select id="difficulty-select">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+        </select></p>
+        <p id="message">Select difficulty and press Start</p>
     </div>
     <div>
-        <input type="text" id="guess-input" placeholder="Enter city name" autocomplete="off"/>
-        <button id="guess-btn">Guess</button>
-        <button id="new-round-btn" style="display:none;">New Game</button>
+        <input type="text" id="guess-input" placeholder="Enter city name" autocomplete="off" style="display:none;"/>
+        <button id="guess-btn" style="display:none;">Guess</button>
+        <button id="new-round-btn">Start Game</button>
         <p id="target-city" style="display:none;">Target city was: </p> 
     </div>
     <div id="map" style="height: 400px; margin-top: 20px;"></div>
