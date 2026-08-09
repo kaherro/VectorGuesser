@@ -49,44 +49,24 @@ function update_UI() {
     msg_el.className = '';
 }
 
-function set_difficulty_locked(locked) {
-    document.getElementById('difficulty-select').disabled = locked;
-}
-
-function get_selected_difficulty() {
-    return document.getElementById('difficulty-select').value;
-}
-
-function show_gameplay_controls() {
-    document.getElementById('guess-input').style.display = '';
-    document.getElementById('guess-btn').style.display = '';
-    document.getElementById('new-round-btn').style.display = 'none';
-}
-
 function show_game_over(text) {
     const msg_el = document.getElementById('message');
     msg_el.textContent = text;
     msg_el.className = 'error';
     document.getElementById('guess-input').disabled = true;
     document.getElementById('guess-btn').disabled = true;
-    const restart_btn = document.getElementById('new-round-btn');
-    restart_btn.textContent = 'New Game';
-    restart_btn.style.display = 'inline-block';
-    set_difficulty_locked(false);
+    document.getElementById('new-round-btn').style.display = 'inline-block';
 }
 
 async function load_start_city() {
     try {
-        const difficulty = get_selected_difficulty();
-        const resp = await fetch(`/api/start?difficulty=${encodeURIComponent(difficulty)}`);
+        const resp = await fetch('/api/start');
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         start_city_name = data.city.name;
         session_id = data.session_id;
         attempts_left = data.attempts_left ?? 5;
         current_distance = data.vector.distance_km;
-        guessed_counter = 0;
-        score = 0;
         document.getElementById('start-city').textContent = start_city_name;
         document.getElementById('vector-info').textContent =
             `${parseFloat(data.vector.distance_km).toFixed(0)} km @ ${parseFloat(data.vector.angle_deg).toFixed(0)}°`;
@@ -98,9 +78,8 @@ async function load_start_city() {
         document.getElementById('guess-input').value = '';
         document.getElementById('guess-input').disabled = false;
         document.getElementById('guess-btn').disabled = false;
-        show_gameplay_controls();
+        document.getElementById('new-round-btn').style.display = 'none';
         document.getElementById('message').textContent = '';
-        set_difficulty_locked(true);
     } catch (err) {
         console.error('Failed to load start city:', err);
         document.getElementById('start-city').textContent = 'Error';
@@ -123,7 +102,7 @@ async function load_next_round() {
         document.getElementById('guess-input').value = '';
         document.getElementById('guess-input').disabled = false;
         document.getElementById('guess-btn').disabled = false;
-        show_gameplay_controls();
+        document.getElementById('new-round-btn').style.display = 'none';
         const msg_el = document.getElementById('message');
         msg_el.textContent = 'Correct!';
         msg_el.className = 'correct';
@@ -210,4 +189,5 @@ document.getElementById('new-round-btn').addEventListener('click', () => {
 
 window.addEventListener('DOMContentLoaded', () => {
     init_map();
+    load_start_city();
 });

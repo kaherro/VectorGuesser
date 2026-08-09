@@ -46,20 +46,7 @@ void db_manager::load_all_cities() {
         city_.latitude = sqlite3_column_double(stmt.get(), 2);
         city_.longitude = sqlite3_column_double(stmt.get(), 3);
         city_.country = reinterpret_cast<const char*>(sqlite3_column_text(stmt.get(), 4));
-        city_.difficulty = reinterpret_cast<const char*>(sqlite3_column_text(stmt.get(), 5));
         cities.push_back(city_);
-        if (city_.difficulty == "easy") {
-            cities_easy.push_back(city_);
-            cities_medium.push_back(city_);
-            cities_hard.push_back(city_);
-        }
-        else if (city_.difficulty == "medium") {
-            cities_medium.push_back(city_);
-            cities_hard.push_back(city_);
-        }
-        else if (city_.difficulty == "hard") {
-            cities_hard.push_back(city_);
-        }
         std::string name_ = city_.name; 
         std::transform(name_.begin(), name_.end(), name_.begin(), ::tolower); 
         name_to_city[name_] = city_; 
@@ -68,25 +55,14 @@ void db_manager::load_all_cities() {
     log("SQL", "Cities were loaded successfully"); 
 }
 
-city db_manager::get_random_city(const std::string &difficulty) {
+city db_manager::get_random_city() {
     if(cities.empty()) {
         throw std::runtime_error("Cities table is empty"); 
     }
-    if(!difficulty_validation(difficulty)) {
-        throw std::runtime_error("Incorrect 'difficulty' value"); 
-    }
-    const std::vector<city> *pool = nullptr;
-    if (difficulty == "easy")   pool = &cities_easy;
-    else if (difficulty == "medium") pool = &cities_medium;
-    else if (difficulty == "hard")   pool = &cities_hard;
-
-    if (pool->empty()) {
-        throw std::runtime_error("No cities with difficulty '" + difficulty + "' found");
-    }
     std::random_device rd; 
     std::mt19937 gen(rd()); 
-    std::uniform_int_distribution<int> distrib(0, (int)pool->size() - 1); 
-    return (*pool)[distrib(gen)];
+    std::uniform_int_distribution<int> distrib(1, 9999999); 
+    return cities[distrib(gen) % (int)cities.size()]; 
 }
 
 std::optional<city> db_manager::get_city_by_name(const std::string &name) {
