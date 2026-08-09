@@ -6,19 +6,24 @@
 #include <memory>
 #include <unordered_map>
 
+static inline bool difficulty_validation(const std::string &difficulty) {
+    return difficulty == "easy" || difficulty == "medium" || difficulty == "hard";
+}
+
 struct city {
     long long id{};
     std::string name; 
     double latitude{};
     double longitude{};
     std::string country; 
+    std::string difficulty; 
 };
 
 class db_manager {
 public:
     explicit db_manager(const std::string &db_path);
 
-    city get_random_city(); 
+    city get_random_city(const std::string &difficulty); 
     std::optional<city> get_city_by_name(const std::string &name); 
     
     struct vector_geo {
@@ -36,5 +41,5 @@ private:
     std::unique_ptr<sqlite3, sqlite3_deleter> db;
     void load_all_cities();
     std::unordered_map<std::string, city> name_to_city; 
-    std::vector<city> cities; 
+    std::vector<city> cities, cities_easy, cities_medium, cities_hard; 
 };
