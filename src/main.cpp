@@ -68,6 +68,13 @@ int main() {
 
     crow::SimpleApp app;
 
+    CROW_ROUTE(app, "/")
+    ([](){
+        crow::response res(302); 
+        res.set_header("Location", "/index.html");
+        return res; 
+    });
+
     CROW_ROUTE(app, "/<string>")
     ([](const crow::request& req, std::string path){
         if (path.empty()) path = "index.html";
@@ -207,5 +214,5 @@ int main() {
     });
 
     std::cout << "Server listening on http://0.0.0.0:18080\n";
-    app.port(18080).multithreaded().run();
+    app.port(18080).bindaddr("0.0.0.0").multithreaded().run();
 }
