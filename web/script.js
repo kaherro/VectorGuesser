@@ -159,10 +159,10 @@ async function make_guess() {
             return;
         }
 
-        if (raw_text === 'Attempts are over') {
+        if (raw_text.startsWith('No attempts left. Game over.')) {
             attempts_left = 0;
             update_UI();
-            show_game_over('No attempts left. Game over.');
+            show_game_over(raw_text);
             guess_input.value = '';
             return;
         }
