@@ -10,8 +10,8 @@ let score = 0;
 
 function init_map() {
     map = L.map('map').setView([20, 0], 2); 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);
 }
 
@@ -57,6 +57,14 @@ function get_selected_difficulty() {
     return document.getElementById('difficulty-select').value;
 }
 
+function set_capitals_only_locked(locked) {
+    document.getElementById('capitals-only-checkbox').disabled = locked;
+}
+
+function get_capitals_only() {
+    return document.getElementById('capitals-only-checkbox').checked;
+}
+
 function show_gameplay_controls() {
     document.getElementById('guess-input').style.display = '';
     document.getElementById('guess-btn').style.display = '';
@@ -73,12 +81,15 @@ function show_game_over(text) {
     restart_btn.textContent = 'New Game';
     restart_btn.style.display = 'inline-block';
     set_difficulty_locked(false);
+    set_capitals_only_locked(false);
 }
 
 async function load_start_city() {
     try {
         const difficulty = get_selected_difficulty();
-        const resp = await fetch(`/api/start?difficulty=${encodeURIComponent(difficulty)}`);
+        const capitals_only = get_capitals_only();
+        console.log(`Loading start city with difficulty=${difficulty}, capitals_only=${capitals_only}`);
+        const resp = await fetch(`/api/start?difficulty=${encodeURIComponent(difficulty)}&capitals_only=${encodeURIComponent(capitals_only)}`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         start_city_name = data.city.name;
@@ -101,6 +112,7 @@ async function load_start_city() {
         show_gameplay_controls();
         document.getElementById('message').textContent = '';
         set_difficulty_locked(true);
+        set_capitals_only_locked(true);
     } catch (err) {
         console.error('Failed to load start city:', err);
         document.getElementById('start-city').textContent = 'Error';
@@ -159,10 +171,10 @@ async function make_guess() {
             return;
         }
 
-        if (raw_text === 'Attempts are over') {
+        if (raw_text.startsWith('No attempts left. Game over.')) {
             attempts_left = 0;
             update_UI();
-            show_game_over('No attempts left. Game over.');
+            show_game_over(raw_text);
             guess_input.value = '';
             return;
         }

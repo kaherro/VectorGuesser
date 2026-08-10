@@ -17,13 +17,14 @@ struct city {
     double longitude{};
     std::string country; 
     std::string difficulty; 
+    bool capital; 
 };
 
 class db_manager {
 public:
     explicit db_manager(const std::string &db_path);
 
-    city get_random_city(const std::string &difficulty); 
+    city get_random_city(const std::string &difficulty, const bool &capitals_only); 
     std::optional<city> get_city_by_name(const std::string &name); 
     
     struct vector_geo {
@@ -41,5 +42,5 @@ private:
     std::unique_ptr<sqlite3, sqlite3_deleter> db;
     void load_all_cities();
     std::unordered_map<std::string, city> name_to_city; 
-    std::vector<city> cities, cities_easy, cities_medium, cities_hard; 
+    std::unordered_map<std::string, std::vector<city>> cities; 
 };

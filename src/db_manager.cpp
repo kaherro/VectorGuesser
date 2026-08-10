@@ -47,18 +47,32 @@ void db_manager::load_all_cities() {
         city_.longitude = sqlite3_column_double(stmt.get(), 3);
         city_.country = reinterpret_cast<const char*>(sqlite3_column_text(stmt.get(), 4));
         city_.difficulty = reinterpret_cast<const char*>(sqlite3_column_text(stmt.get(), 5));
-        cities.push_back(city_);
-        if (city_.difficulty == "easy") {
-            cities_easy.push_back(city_);
-            cities_medium.push_back(city_);
-            cities_hard.push_back(city_);
+        city_.capital = (sqlite3_column_int64(stmt.get(), 6) != 0); 
+        if(city_.capital) {
+            if(city_.difficulty == "easy") {
+                cities["easy-capitals"].push_back(city_);
+                cities["medium-capitals"].push_back(city_);
+                cities["hard-capitals"].push_back(city_);
+            }
+            else if(city_.difficulty == "medium") {
+                cities["medium-capitals"].push_back(city_);
+                cities["hard-capitals"].push_back(city_);
+            }
+            else if(city_.difficulty == "hard") {
+                cities["hard-capitals"].push_back(city_);
+            }
         }
-        else if (city_.difficulty == "medium") {
-            cities_medium.push_back(city_);
-            cities_hard.push_back(city_);
+        if(city_.difficulty == "easy") {
+            cities["easy"].push_back(city_);
+            cities["medium"].push_back(city_);
+            cities["hard"].push_back(city_);
         }
-        else if (city_.difficulty == "hard") {
-            cities_hard.push_back(city_);
+        else if(city_.difficulty == "medium") {
+            cities["medium"].push_back(city_);
+            cities["hard"].push_back(city_);
+        }
+        else if(city_.difficulty == "hard") {
+            cities["hard"].push_back(city_);
         }
         std::string name_ = city_.name; 
         std::transform(name_.begin(), name_.end(), name_.begin(), ::tolower); 
@@ -68,18 +82,20 @@ void db_manager::load_all_cities() {
     log("SQL", "Cities were loaded successfully"); 
 }
 
-city db_manager::get_random_city(const std::string &difficulty) {
+city db_manager::get_random_city(const std::string &difficulty, const bool &capitals_only) {
     if(cities.empty()) {
         throw std::runtime_error("Cities table is empty"); 
     }
     if(!difficulty_validation(difficulty)) {
         throw std::runtime_error("Incorrect 'difficulty' value"); 
     }
-    const std::vector<city> *pool = nullptr;
-    if (difficulty == "easy")   pool = &cities_easy;
-    else if (difficulty == "medium") pool = &cities_medium;
-    else if (difficulty == "hard")   pool = &cities_hard;
-
+    const std::vector<city> *pool = nullptr; 
+    if(capitals_only) {
+        pool = &cities[difficulty + "-capitals"];
+    }
+    else {
+        pool = &cities[difficulty];
+    }
     if (pool->empty()) {
         throw std::runtime_error("No cities with difficulty '" + difficulty + "' found");
     }
