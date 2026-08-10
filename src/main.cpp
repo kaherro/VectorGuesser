@@ -31,6 +31,7 @@ struct session {
     city target; 
     int attempts_left = 10; 
     std::string difficulty = "easy"; 
+    bool capitals = false; 
 };
 std::mutex sessions_mutex;
 std::unordered_map<std::string, session> sessions; 
@@ -98,7 +99,12 @@ int main() {
             if (!difficulty_validation(difficulty)) {
                 return crow::response(400, crow::json::wvalue{{"error", "Incorrect 'difficulty' parameter value"}});
             }
-            auto city_from = db.get_random_city(difficulty);
+            auto capitals_only_ = req.url_params.get("capitals_only");
+            if(!capitals_only_) {
+                return crow::response(400, crow::json::wvalue{{"error", "Missing 'capitals_only' parameter"}});
+            }
+            bool capitals_only(std::string(capitals_only_) == "true"); 
+            auto city_from = db.get_random_city(difficulty, capitals_only);
             crow::json::wvalue json_res;
             json_res["city"]["id"] = city_from.id;
             json_res["city"]["name"] = city_from.name;
@@ -107,14 +113,15 @@ int main() {
             json_res["city"]["country"] = city_from.country;
             std::string session_id = new_session_id(); 
             json_res["session_id"] = session_id; 
-            auto city_to = db.get_random_city(difficulty); 
+            auto city_to = db.get_random_city(difficulty, capitals_only); 
             while(city_from.name == city_to.name) {
-                city_to = db.get_random_city(difficulty); 
+                city_to = db.get_random_city(difficulty, capitals_only); 
             }
             {
                 std::lock_guard<std::mutex> lock(sessions_mutex);
                 sessions[session_id].target = city_to;
                 sessions[session_id].difficulty = difficulty;
+                sessions[session_id].capitals = capitals_only;
                 json_res["attempts_left"] = sessions[session_id].attempts_left;
             }
             auto vec = db.count_vector(city_from.name, city_to.name);
@@ -194,14 +201,16 @@ int main() {
             }
             std::string session_id = session_id_; 
             std::string difficulty; 
+            bool capitals_only = false; 
             {
                 std::lock_guard<std::mutex> lock(sessions_mutex);
                 if(!sessions.contains(session_id)) {
                     return crow::response(404, crow::json::wvalue{{"error", "Session " + session_id + " doesn't exist or was terminated"}});
                 }
                 difficulty = sessions[session_id].difficulty; 
+                capitals_only = sessions[session_id].capitals; 
             }
-            auto city_from = db.get_random_city(difficulty);
+            auto city_from = db.get_random_city(difficulty, capitals_only);
             crow::json::wvalue json_res;
             json_res["city"]["id"] = city_from.id;
             json_res["city"]["name"] = city_from.name;
@@ -209,9 +218,9 @@ int main() {
             json_res["city"]["longitude"] = round_to_4(city_from.longitude);
             json_res["city"]["country"] = city_from.country;
             json_res["session_id"] = session_id; 
-            auto city_to = db.get_random_city(difficulty); 
+            auto city_to = db.get_random_city(difficulty, capitals_only); 
             while(city_from.name == city_to.name) {
-                city_to = db.get_random_city(difficulty); 
+                city_to = db.get_random_city(difficulty, capitals_only); 
             }
             {
                 std::lock_guard<std::mutex> lock(sessions_mutex);

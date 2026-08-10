@@ -57,6 +57,14 @@ function get_selected_difficulty() {
     return document.getElementById('difficulty-select').value;
 }
 
+function set_capitals_only_locked(locked) {
+    document.getElementById('capitals-only-checkbox').disabled = locked;
+}
+
+function get_capitals_only() {
+    return document.getElementById('capitals-only-checkbox').checked;
+}
+
 function show_gameplay_controls() {
     document.getElementById('guess-input').style.display = '';
     document.getElementById('guess-btn').style.display = '';
@@ -73,12 +81,15 @@ function show_game_over(text) {
     restart_btn.textContent = 'New Game';
     restart_btn.style.display = 'inline-block';
     set_difficulty_locked(false);
+    set_capitals_only_locked(false);
 }
 
 async function load_start_city() {
     try {
         const difficulty = get_selected_difficulty();
-        const resp = await fetch(`/api/start?difficulty=${encodeURIComponent(difficulty)}`);
+        const capitals_only = get_capitals_only();
+        console.log(`Loading start city with difficulty=${difficulty}, capitals_only=${capitals_only}`);
+        const resp = await fetch(`/api/start?difficulty=${encodeURIComponent(difficulty)}&capitals_only=${encodeURIComponent(capitals_only)}`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         start_city_name = data.city.name;
@@ -101,6 +112,7 @@ async function load_start_city() {
         show_gameplay_controls();
         document.getElementById('message').textContent = '';
         set_difficulty_locked(true);
+        set_capitals_only_locked(true);
     } catch (err) {
         console.error('Failed to load start city:', err);
         document.getElementById('start-city').textContent = 'Error';
