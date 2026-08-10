@@ -154,7 +154,10 @@ int main() {
             sessions[session_id].attempts_left--; 
             if(sessions[session_id].attempts_left <= 0) {
                 sessions.erase(session_id);
-                return crow::response(200, "Attempts are over"); 
+                if(to.size() > 0 && to[0] >= 'a' && to[0] <= 'z') {
+                    to[0] += 'A' - 'a'; 
+                } 
+                return crow::response(200, "No attempts left. Game over. Target city was: " + to); 
             }
             db_manager::vector_geo vec = db.count_vector(from, to); 
             crow::json::wvalue json_res;
