@@ -46,3 +46,31 @@ button {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+.autocomplete-container {
+    position: relative;
+    width: 300px;
+}
+
+.dropdown-content {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 4px;
+    width: 200px;
+    font-size: 1em;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 2000;
+}
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+}
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+.hidden {
+    display: none;
+}

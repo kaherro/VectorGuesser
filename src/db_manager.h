@@ -26,7 +26,8 @@ public:
 
     city get_random_city(const std::string &difficulty, const bool &capitals_only); 
     std::optional<city> get_city_by_name(const std::string &name); 
-    
+    std::vector<std::string> get_city_names(const std::string &difficulty, const bool &capitals_only);
+
     struct vector_geo {
         double distance_km;
         double angle_deg; 
