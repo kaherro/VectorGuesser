@@ -237,6 +237,35 @@ int main() {
         }
     });
 
+    CROW_ROUTE(app, "/api/cities").methods(
+        crow::HTTPMethod::GET)([&db](const crow::request &req){
+            try {
+                auto difficulty_ = req.url_params.get("difficulty");
+                if(!difficulty_) {
+                    return crow::response(400, crow::json::wvalue{{"error", "Missing 'difficulty' parameter"}});
+                }
+                std::string difficulty(difficulty_);
+                if (!difficulty_validation(difficulty)) {
+                    return crow::response(400, crow::json::wvalue{{"error", "Incorrect 'difficulty' parameter value"}});
+                }
+                auto capitals_only_ = req.url_params.get("capitals_only");
+                if(!capitals_only_) {
+                    return crow::response(400, crow::json::wvalue{{"error", "Missing 'capitals_only' parameter"}});
+                }
+                bool capitals_only(std::string(capitals_only_) == "true");
+
+                auto city_names = db.get_city_names(difficulty, capitals_only);
+                crow::json::wvalue json_res;
+                for (size_t i = 0; i < city_names.size(); ++i) {
+                    json_res[i] = city_names[i];
+                }
+                return crow::response(json_res);
+            }
+            catch (const std::exception &e) {
+                return crow::response(500, crow::json::wvalue{{"error", e.what()}});
+            }
+        });
+
     std::cout << "Server listening on http://0.0.0.0:18080\n";
     app.port(18080).bindaddr("0.0.0.0").multithreaded().run();
 }

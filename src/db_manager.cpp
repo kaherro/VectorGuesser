@@ -39,6 +39,9 @@ void db_manager::load_all_cities() {
 
     std::unique_ptr<sqlite3_stmt, decltype(stmt_deleter)> stmt(raw_stmt, stmt_deleter);
 
+    cities.clear();
+    name_to_city.clear();
+
     while (sqlite3_step(stmt.get()) == SQLITE_ROW) {
         city city_; 
         city_.id = sqlite3_column_int64(stmt.get(), 0);
@@ -79,6 +82,10 @@ void db_manager::load_all_cities() {
         name_to_city[name_] = city_; 
     }
 
+    if (cities.empty()) {
+        throw std::runtime_error("No cities found in database");
+    }
+
     log("SQL", "Cities were loaded successfully"); 
 }
 
@@ -112,6 +119,31 @@ std::optional<city> db_manager::get_city_by_name(const std::string &name) {
         return name_to_city[name_];
     }
     return std::nullopt;
+}
+
+std::vector<std::string> db_manager::get_city_names(const std::string &difficulty, const bool &capitals_only) {
+    if(cities.empty()) {
+        throw std::runtime_error("Cities table is empty");
+    }
+    if(!difficulty_validation(difficulty)) {
+        throw std::runtime_error("Incorrect 'difficulty' value");
+    }
+    const std::vector<city> *pool = nullptr;
+    if(capitals_only) {
+        pool = &cities[difficulty + "-capitals"];
+    }
+    else {
+        pool = &cities[difficulty];
+    }
+    if (pool->empty()) {
+        throw std::runtime_error("No cities with difficulty '" + difficulty + "' found");
+    }
+    std::vector<std::string> names;
+    names.reserve(pool->size());
+    for (const auto& c : *pool) {
+        names.push_back(c.name);
+    }
+    return names;
 }
 
 static inline double deg_to_rad(double x) {

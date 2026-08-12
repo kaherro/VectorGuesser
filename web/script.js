@@ -7,6 +7,7 @@ let attempts_left = 10;
 let current_distance = 0;
 let guessed_counter = 0;
 let score = 0; 
+let citySuggestions = []; 
 
 function init_map() {
     map = L.map('map').setView([20, 0], 2); 
@@ -113,10 +114,24 @@ async function load_start_city() {
         document.getElementById('message').textContent = '';
         set_difficulty_locked(true);
         set_capitals_only_locked(true);
+        await fetch_city_suggestions(difficulty, capitals_only);
     } catch (err) {
         console.error('Failed to load start city:', err);
         document.getElementById('start-city').textContent = 'Error';
         document.getElementById('vector-info').textContent = 'Error';
+    }
+}
+
+async function fetch_city_suggestions(difficulty, capitals_only) {
+    try {
+        const resp = await fetch(`/api/cities?difficulty=${encodeURIComponent(difficulty)}&capitals_only=${encodeURIComponent(capitals_only)}`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        citySuggestions = Object.values(data);
+        console.log(`Fetched ${citySuggestions.length} city suggestions for difficulty=${difficulty}, capitals_only=${capitals_only}`);
+    } catch (err) {
+        console.error('Failed to fetch city suggestions:', err);
+        citySuggestions = [];
     }
 }
 
@@ -209,9 +224,40 @@ async function make_guess() {
     }
 }
 
+const dropdown = document.getElementById('dropdown-list');
+const input = document.getElementById('guess-input');
+input.addEventListener('input', () => {
+    const query = input.value.toLowerCase();
+    dropdown.innerHTML = '';
+    if (!query) {
+        dropdown.classList.add('hidden');
+        return;
+    }
+    const filtered = citySuggestions.filter(item => item.toLowerCase().includes(query));
+
+    if (filtered.length > 0) {
+        filtered.forEach(item => {
+            const div = document.createElement('div');
+            div.classList.add('dropdown-item');
+            div.textContent = item;
+            div.addEventListener('click', () => {
+                input.value = item;
+                dropdown.classList.add('hidden');
+            });
+            dropdown.appendChild(div);
+        });
+        dropdown.classList.remove('hidden');
+    } else {
+        dropdown.classList.add('hidden');
+    }
+});
+
 document.getElementById('guess-btn').addEventListener('click', make_guess);
 document.getElementById('guess-input').addEventListener('keypress', e => {
     if (e.key === 'Enter') make_guess();
+    if (!e.target.closest('.autocomplete-container')) {
+        dropdown.classList.add('hidden');
+    }
 });
 
 document.getElementById('new-round-btn').addEventListener('click', () => {
