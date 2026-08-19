@@ -64,6 +64,8 @@ function update_UI() {
     const msg_el = document.getElementById('message');
     msg_el.textContent = 'Choose settings and press «Start game»';
     msg_el.className = 'message';
+    document.getElementById('message-correct').classList.add('hidden');
+    document.getElementById('message-error').classList.add('hidden');
     update_pips();
 }
 
@@ -117,13 +119,18 @@ function show_game_over(text) {
     const msg_el = document.getElementById('message');
     msg_el.textContent = text;
     msg_el.className = 'message-error';
-    document.getElementById('input-field').disabled = true;
-    document.getElementById('check-button').disabled = true;
-    const restart_btn = document.getElementById('start-game-button');
-    restart_btn.textContent = 'New Game';
-    restart_btn.style.display = 'inline-block';
-    set_difficulty_locked(false);
-    set_capitals_only_locked(false);
+    document.getElementById('result-field').classList.remove('hidden');
+    document.getElementById('result-guessed').textContent = guessed_counter;
+    document.getElementById('result-total').textContent = score;
+    const target = text.split(':').pop();
+    console.log(target);
+    document.getElementById('result-answer').textContent = `Last targe city was: ${target}`;
+
+    const element = document.getElementById(start_button);
+    element.textContent = 'Stat Game'; 
+    element.id = 'start-game-button'; 
+    start_button = element.id; 
+    new_game_UI();
 }
 
 async function load_start_city() {
@@ -147,7 +154,9 @@ async function load_start_city() {
 
         document.getElementById('vec-dist').textContent = `Distance: ${parseFloat(data.vector.distance_km).toFixed(0)} km`;
         document.getElementById('guessed-number').textContent = 0;
-        document.getElementById('score').textContent = 'Score: 0';
+        document.getElementById('score-points').textContent = 0;
+        document.getElementById('game-start-field').classList.add('hidden');
+        document.getElementById('result-field').classList.add('hidden');
         start_marker = true; 
         add_city_marker(data.city, data.vector.angle_deg, data.vector.distance_km);
         update_UI();
@@ -185,6 +194,7 @@ async function load_next_round() {
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         start_city_name = data.city.name;
+        current_distance = data.vector.distance_km;
         attempts_left = data.attempts_left ?? 10;
         document.getElementById('start-city').textContent = start_city_name;
         let deg = parseFloat(data.vector.angle_deg);
@@ -197,11 +207,13 @@ async function load_next_round() {
         document.getElementById('input-field').disabled = false;
         document.getElementById('check-button').disabled = false;
         show_gameplay_controls();
-        const msg_el = document.getElementById('message');
-        msg_el.textContent = 'Correct!';
-        msg_el.className = 'message-correct';
+        document.getElementById('message').textContent = `Where does the vector from ${start_city_name} lead?`;
+        document.getElementById('message-correct').classList.remove('hidden');
+        document.getElementById('message-error').classList.add('hidden');
     } catch (err) {
         console.error('Failed to load next round:', err);
+        document.getElementById('message-correct').classList.add('hidden');
+        document.getElementById('message-error').classList.add('hidden');
         document.getElementById('message').textContent = 'Error loading next round';
         document.getElementById('message').className = 'message-error';
     }
@@ -220,14 +232,11 @@ async function make_guess() {
         const raw_text = await resp.text();
 
         if (raw_text === 'Correct') {
-            const msg_el = document.getElementById('message');
-            msg_el.textContent = 'Correct!';
-            msg_el.className = 'message-correct';
             guess_input.value = '';
             start_marker = true; 
             document.getElementById('guessed-number').textContent = ++guessed_counter;
             score += current_distance;
-            document.getElementById('score').textContent = `Score: ${score.toFixed(0)}`;
+            document.getElementById('score-points').textContent = `${score.toFixed(0)}`;
             await load_next_round();
             return;
         }
@@ -249,11 +258,11 @@ async function make_guess() {
 
         add_city_marker(data.city, data.vector.angle_deg, data.vector.distance_km);
         attempts_left = data.attempts_left ?? attempts_left;
-        current_distance = data.vector.distance_km;
+        current_distance = Math.min(data.vector.distance_km, current_distance);
         update_UI();
-        const msg_el = document.getElementById('message');
-        msg_el.textContent = `Wrong. ${parseFloat(data.vector.distance_km).toFixed(0)} km @ ${parseFloat(data.vector.angle_deg).toFixed(0)}°`;
-        msg_el.className = 'message-error';
+        document.getElementById('message').textContent = `But maybe you know where does the vector from ${data.city.name} lead?`;
+        document.getElementById('message-correct').classList.add('hidden');
+        document.getElementById('message-error').classList.remove('hidden');
         if (attempts_left <= 0) {
             show_game_over(msg_el.textContent + ' No attempts left. Game over.');
         }
@@ -267,6 +276,8 @@ async function make_guess() {
             document.getElementById('message').textContent = 'Error contacting server';
         }
         document.getElementById('message').className = 'message-error';
+        document.getElementById('message-correct').classList.add('hidden');
+        document.getElementById('message-error').classList.add('hidden');
     }
 }
 
@@ -332,12 +343,18 @@ document.getElementById(start_button).addEventListener('click', () => {
         load_start_city();
     }
     else {
+        document.getElementById('game-start-field').classList.remove('hidden');
         element.textContent = 'Stat Game'; 
         element.id = 'start-game-button'; 
         start_button = element.id; 
         new_game_UI();
     }
 });
+
+document.getElementById('result-next').addEventListener('click', () => {
+    load_start_city();
+});
+
 
 window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('input-field').value = '';

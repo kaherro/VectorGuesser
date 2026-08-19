@@ -86,11 +86,46 @@
                 <button id="check-button" class="check-button" disabled="">Check →</button>
             </div>
         </div>
-        <div id="map"></div>
+
+        <div id="map">
+            <div id="game-start-field" class="">
+                <div class="back-blur">
+                    Choose settings and press&nbsp;<strong>«Start game»</strong>
+                </div>
+            </div>
+            <div id="result-field" class="hidden">
+                <div class="back-blur">
+                    <div id="result-card">
+                        <div id="result-icon">💀</div> 
+                        <div class="result-status fail" id="res-status">No more attempts left. <br> Game ended!</div>
+                        <div class="result-answer" id="result-answer">Last targe city was: <strong>—</strong></div>
+                        <div class="result-divider"></div>
+                        <div class="result-stats">
+                            <div class="result-stat">
+                                <div class="result-stat-val" id="result-guessed">0</div>
+                                <div class="result-stat-label">Guessed</div>
+                            </div>
+                            <div class="result-stat">
+                                <div class="result-stat-val green" id="result-total">0</div>
+                                <div class="result-stat-label">Total score</div>
+                            </div>
+                        </div>
+                        <button class="result-next" id="result-next">Start new game</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="bottom-info">
-        <div class="message" id="message">Choose settings and press «Start game»</div>
-        <div id="score"></div>
+        <div class="message-field">
+            <div class="message-correct hidden" id="message-correct">Correct!</div>
+            <div class="message-error hidden" id="message-error">Wrong.</div>
+            <div class="message" id="message">Choose settings and press «Start game»</div>
+        </div>
+        <div class="score-field">
+            <div id="score">Score: </div>
+            <div id="score-points" class="score-points">0</div>
+        </div>
     </div>
 </div>
 

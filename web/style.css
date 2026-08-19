@@ -3,7 +3,6 @@ body {
     font-family: var(--font-sans, system-ui); 
     color: #1a2438; 
 }
-
 #game-window {
     width: 95%;  
     max-width: 1400px; 
@@ -13,8 +12,6 @@ body {
     left: 50%;
     transform: translateX(-50%);
 }
-
-
 #settings-section {
     display: flex;
     border: 1px solid #00000014;;
@@ -23,29 +20,24 @@ body {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
-
 #game-info {
     display: flex;
     align-items: center;
     gap: 10px;
 }
-
 #game-name {
     font-size: 15px;
     font-weight: bold;
 }
-
 #game-subtitle {
     font-size: 12px;
     color: #666;
 }
-
 #options {
     display: flex;
     justify-content: flex-end;
     margin-left: auto;
 }
-
 #difficulty-select {
     display: inline-flex;
     border: 1px solid #ccc;
@@ -55,7 +47,6 @@ body {
     position: relative;
     right: 20px; 
 }
-
 .difficulty-option {
     padding: 6px 14px;
     font-size: 0.95em;
@@ -65,24 +56,19 @@ body {
     transition: background 0.15s, color 0.15s;
     white-space: nowrap;
 }
-
 .difficulty-option:not(:last-child) {
     border-right: 1px solid #ccc;
 }
-
 .difficulty-option:hover:not(.active) {
     background: #f0f0f0;
 }
-
 .difficulty-option.active {
     background: rgba(0,0,0,0.06);
 }
-
 #difficulty-select.locked {
     opacity: 0.5;
     pointer-events: none;
 }
-
 #capitals-switch {
     position: relative;
     display: inline-block;
@@ -92,13 +78,11 @@ body {
     height: 20px;
     right: 10px;
 }
-
 #capitals-switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
-
 #capitals-slider {
     position: absolute;
     cursor: pointer;
@@ -108,7 +92,6 @@ body {
     transition: .4s;
     border-radius: 34px;
 }
-
 #capitals-slider:before {
     position: absolute;
     content: "";
@@ -120,17 +103,14 @@ body {
     transition: .4s;
     border-radius: 9px;
 }
-
 input:checked + #capitals-slider {
     background-color: #4ade8021;
     border: 1px solid #16a34a59;
 }
-
 input:checked + #capitals-slider:before {
     transform: translateX(18px);
     background-color: #16a34a;
 }
-
 #capitals-label {
     font-size: 14px;
     color: #666;
@@ -138,7 +118,6 @@ input:checked + #capitals-slider:before {
     display: flex;
     align-items: center;
 }
-
 #start-game-button {
     background-color: #4CAF50;
     color: white;
@@ -150,19 +129,15 @@ input:checked + #capitals-slider:before {
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 #start-game-button:hover {
     background-color: #50b655ed;
 }
-
 #start-game-button.clicked {
     background-color: #888888;
 }
-
 #start-game-button.clicked:hover {
     background-color: #999999;
 }
-
 #new-game-button {
     background-color: #0000000d;
     color: #5b6b82;
@@ -177,7 +152,6 @@ input:checked + #capitals-slider:before {
 #new-game-button:hover {
     background-color: #00000009;
 }
-
 #guess-section {
     border: 1px solid #00000014;;
     border-top: 0px;
@@ -191,7 +165,6 @@ input:checked + #capitals-slider:before {
     height: 642px;
     z-index: 10;
 }
-
 #start-city-label {
     font-size: 12px;
     text-transform: uppercase;
@@ -199,13 +172,11 @@ input:checked + #capitals-slider:before {
     color: #94a3b8;
     margin-bottom: 5px;
 }
-
 #start-city {
     font-size: 17px;
     font-weight: 500;
     color: #1a2438;
 }
-
 #compass-box {
     background: #16a34a1a;
     border: 1px solid #16a34a1a;
@@ -213,14 +184,12 @@ input:checked + #capitals-slider:before {
     padding: 14px;
     text-align: center;
 }
-
 #compass {
     width: 68px;
     height: 68px;
     margin: 0 auto 10px;
     position: relative;
 }
-
 #compass-circle {
     width: 100%;
     height: 100%;
@@ -231,7 +200,6 @@ input:checked + #capitals-slider:before {
     align-items: center;
     justify-content: center;
 }
-
 #compass-circle::before {
     content: '';
     position: absolute;
@@ -242,38 +210,32 @@ input:checked + #capitals-slider:before {
     transform: rotate(var(--deg,-45deg));
     right: 50%;
 }
-
 .card {
     position: absolute;
     font-size: 9px;
     color: #94a3b8;
     font-weight: 500;
 }
-
 .card.n {
     top: 3px;
     left: 50%;
     transform: translateX(-50%);
 }
-
 .card.e {
     right: 3px;
     top: 50%;
     transform: translateY(-50%);
 }
-
 .card.s {
     bottom: 3px;
     left: 50%;
     transform: translateX(-50%);
 }
-
 .card.w {
     left: 3px;
     top: 50%;
     transform: translateY(-50%);
 }
-
 .c-dot {
     width: 6px;
     height: 6px;
@@ -282,32 +244,27 @@ input:checked + #capitals-slider:before {
     position: relative;
     z-index: 1;
 }
-
 #vec-dir {
     font-size: 13px;
     color: #16a34a;
     font-weight: 500;
 }
-
 #vec-dist {
     font-size: 11px;
     color: #5b6b82;
     margin-top: 3px;
 }
-
 #stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
 }
-
-.stats-item {
+stats-item {
     background: #00000008;
     border: 0.5px solid #0000000f;
     border-radius: 6px;
     padding: 9px 10px;
 }
-
 .guess-label {
     font-size: 10px;
     text-transform: uppercase;
@@ -315,29 +272,24 @@ input:checked + #capitals-slider:before {
     color: #94a3b8; 
     margin-bottom: 5px;
 }
-
 .attempts-number {
     font-size: 20px;
     font-weight: 500;
     color: #1a2438;
 }
-
 .attempts-number.green {  
     color: #16a34a;
 }
-
 #guessed-number {
     font-size: 20px;
     font-weight: 500;
     color: #1a2438;
 }
-
 #pips {
     display: flex;
     gap: 4px;
     flex-wrap: wrap;
 }
-
 .pip {
     width: 16px;
     height: 5px;
@@ -345,15 +297,12 @@ input:checked + #capitals-slider:before {
     background: #00000014;
     transition: background 0.2s;
 }
-
 .pip.on {
     background: #16a34a;
 }
-
 #guess-input {
     margin-top: auto;
 }
-
 .input-field {
     width: 90%;
     background: #ffffff;
@@ -365,19 +314,15 @@ input:checked + #capitals-slider:before {
     outline: none;
     transition: border-color 0.15s;
 }
-
 .input-field:disabled {
     opacity: 0.4;
     cursor: not-allowed;
     background: #f8fafc;
 }
-
-
 .autocomplete-container {
     position: relative;
     width: 300px;
 }
-
 .dropdown-content {
     position: absolute;
     background-color: white;
@@ -401,7 +346,6 @@ input:checked + #capitals-slider:before {
 .hidden {
     display: none;
 }
-
 .check-button {
     width: 100%;
     margin-top: 8px;
@@ -415,12 +359,10 @@ input:checked + #capitals-slider:before {
     cursor: pointer;
     transition: background 0.15s;
 }
-
 .check-button:disabled {
     opacity: 0.3;
     cursor: not-allowed;
 }
-
 #map {
     border-right: 1px solid #00000000;
     border-bottom: 1px solid #00000000;
@@ -428,7 +370,6 @@ input:checked + #capitals-slider:before {
     flex-grow: 1;
     width: 100%;
 }
-
 #main-game-area {
     width: 100%;
     height: 100%; 
@@ -437,7 +378,6 @@ input:checked + #capitals-slider:before {
     margin-top: 0px;
     align-items: flex-start;
 }
-
 #bottom-info {
     border: 1px solid #00000014;
     border-top: 0px;
@@ -451,18 +391,119 @@ input:checked + #capitals-slider:before {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
-
+.message-field {
+    display: flex;
+    gap: 5px;
+}
+.score-field {
+    font-size: 18px;
+    font-weight: 500;
+    color: #1a2438;
+    display: flex;
+    gap: 5px;
+}
+.score-points {
+    color: #16a34a; 
+}
 .message {
     font-size: 14px;
     color: #5b6b82;
 }
-
 .message-correct {
+    position: relative;
     font-size: 14px;
     color: #16a34a; 
 }
-
 .message-error {
     font-size: 14px;
     color: #fa5050; 
+}
+#result-card {
+    background: #ffffff;
+    border: 0.5px solid #0000001a;
+    border-radius: 14px;
+    padding: 28px 32px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;  
+    gap: 16px;
+    text-align: center;
+    box-shadow: 0 10px 30px #00000026;
+}
+.back-blur {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    background: #ffffff4d; 
+    backdrop-filter: blur(4px); 
+}
+#result-icon {
+    font-size: 36px;
+    line-height: 1;
+}
+.result-status {
+    font-size: 18px;
+    font-weight: 500;
+}
+.result-answer {
+    font-size: 12px;
+    color: #8b9ab0;
+    line-height: 1.6;
+}
+.result-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(215, 215, 215, 0.371);
+}
+.result-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+}
+.result-next {
+    width: 100%;
+    background: #4CAF50;
+    color: #ffffff;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.result-next:hover {
+    background-color: #50b655ed;
+}
+.popup-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px #00000033;
+}
+.result-stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #94a3b8;
+}
+.result-stat-val {
+    font-size: 20px;
+    font-weight: 500;
+    color: #1a2438;
+}
+.result-stat-val.green {
+    color: #16a34a;
+}
+#game-start-field {
+    font-size: 14px;
+    color: #5b6b82;
 }
