@@ -34,9 +34,19 @@ function add_city_marker(city, angle = 0, distance = 0) {
     const custom_icon = L.divIcon({
         className: 'rotated-marker-container',
         iconSize: [width, height],
-        iconAnchor: [width / 2, 31],
-        tooltipAnchor: [0, -height],
-        html: `<img src="${icon_url}" style="width: ${width}px; height: ${height}px; transform: rotate(${angle}deg); transform-origin: bottom center;" />`
+        iconAnchor: [width / 2, height],
+        tooltipAnchor: [0, -height - 10], 
+        html: `
+            <div style="position: relative; width: ${width}px; height: ${height}px;">
+                <img src="${icon_url}" style="width: ${width}px; height: ${height}px; display: block; transform: rotate(${angle}deg); transform-origin: bottom center;" />                
+                <div class="point" style="position: absolute; bottom: 0; left: 50%;">
+                    <div class="m-dot">
+                        <div class="pulse"></div>
+                        <div class="pulse pulse2"></div>
+                    </div>
+                </div>
+            </div>
+        `
     });
 
     const marker = L.marker([parseFloat(city.latitude), parseFloat(city.longitude)], { icon: custom_icon })
@@ -91,8 +101,10 @@ function set_difficulty_locked(locked) {
     const selected = document.getElementById('difficulty-select');
     if (locked) {
         selected.classList.add('locked');
+        selected.setAttribute('data-tooltip', 'Press "New Game" to change setting');
     } else {
         selected.classList.remove('locked');
+        selected.removeAttribute('data-tooltip');
     }
 }
 
