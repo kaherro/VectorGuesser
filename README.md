@@ -72,7 +72,7 @@ The server will start on `http://0.0.0.0`
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/kaherro/VectorGuesser
    cd VectorGuesser
    ```
 

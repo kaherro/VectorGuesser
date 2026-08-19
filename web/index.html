@@ -11,29 +11,122 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="container">
-    <h1>Vector Guesser</h1>
-    <div id="status">
-        <p>Start city: <span id="start-city">-</span></p>
-        <p>Vector: <span id="vector-info">-</span></p>
-        <p>Attempts left: <span id="attempts">10</span></p>
-        <p>Cities guessed: <span id="cities-guessed">0</span></p>
-        <p>Score: <span id="score">0</span></p>
-        <p>Difficulty: <select id="difficulty-select">
-            <option value="easy">Easy</option>
-            <option value="medium" selected>Medium</option>
-            <option value="hard">Hard</option>
-        </select></p>
-        <p><label><input type="checkbox" id="capitals-only-checkbox"> Capital cities only</label></p>
-        <p id="message">Select difficulty and press Start</p>
+    
+<div id="game-window">
+    <div id="settings-section">
+        <div id="game-info">
+            <img src="favicon.ico" id="game-logo">
+            <div>
+                <div id="game-name">Vector Guesser</div>
+                <div id="game-subtitle">GEOGRAPHY GAME</div>
+            </div>
+        </div>
+        <div id="options">
+            <div id="difficulty-select">
+                <div class="difficulty-option active" data-value="easy">Easy</div>
+                <div class="difficulty-option" data-value="medium">Medium</div>
+                <div class="difficulty-option" data-value="hard">Hard</div>
+            </div>
+            <label id="capitals-switch">
+                <input type="checkbox" id="capitals-only-checkbox">
+                <span id="capitals-slider"></span>
+            </label>
+            <div id="capitals-label">Capitals only</div>
+            <button id="start-game-button">Start Game</button>
+        </div>
     </div>
-    <div>
-        <input type="text" id="guess-input" placeholder="Enter city name" autocomplete="off" style="display:none;"/>
-        <div id="dropdown-list" class="dropdown-content hidden"></div>
-        <button id="guess-btn" style="display:none;">Guess</button>
-        <button id="new-round-btn">Start Game</button>
+    <div id="main-game-area">
+        <div id="guess-section">
+            <div>
+                <div id="start-city-label">START CITY</div>
+                <div id="start-city">—</div>
+            </div>
+            <div id="compass-box">
+                <div id="compass">
+                    <div id="compass-circle" style="--deg:-45deg">
+                        <span class="card n">N</span>
+                        <span class="card e">E</span>
+                        <span class="card s">S</span>
+                        <span class="card w">W</span>
+                        <div class="c-dot"></div>
+                    </div>
+                </div>
+                <div id="vec-dir">— —</div>
+                <div id="vec-dist">Distance: —</div>
+            </div>
+            <div id="stats">
+                <div class="stats-item">
+                    <div class="guess-label">Attempts</div>
+                    <div id="attempts-number" class="attempts-number green">10</div>
+                </div>
+                <div class="stats-item">
+                    <div class="guess-label">Guessed</div>
+                    <div id="guessed-number">0</div>
+                </div>
+            </div>
+            <div>
+                <div class="guess-label">Attempts left</div>
+                <div id="pips">
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                    <div class="pip on"></div>
+                </div>
+            </div>
+            <div id="guess-input">
+                <div class="guess-label">Your answer</div>
+                <input id="input-field" class="input-field" type="text" placeholder="Type a city name..." disabled="" autocomplete="off">
+                <div id="dropdown-list" class="dropdown-content hidden"></div>
+                <button id="check-button" class="check-button" disabled="">Check →</button>
+            </div>
+        </div>
+
+        <div id="map">
+            <div id="game-start-field" class="">
+                <div class="back-blur">
+                    Choose settings and press&nbsp;<strong>«Start game»</strong>
+                </div>
+            </div>
+            <div id="result-field" class="hidden">
+                <div class="back-blur">
+                    <div id="result-card">
+                        <div id="result-icon">💀</div> 
+                        <div class="result-status fail" id="res-status">No more attempts left. <br> Game ended!</div>
+                        <div class="result-answer" id="result-answer">Last targe city was: <strong>—</strong></div>
+                        <div class="result-divider"></div>
+                        <div class="result-stats">
+                            <div class="result-stat">
+                                <div class="result-stat-val" id="result-guessed">0</div>
+                                <div class="result-stat-label">Guessed</div>
+                            </div>
+                            <div class="result-stat">
+                                <div class="result-stat-val green" id="result-total">0</div>
+                                <div class="result-stat-label">Total score</div>
+                            </div>
+                        </div>
+                        <button class="result-next" id="result-next">Start new game</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="map" style="height: 400px; margin-top: 20px;"></div>
+    <div id="bottom-info">
+        <div class="message-field">
+            <div class="message-correct hidden" id="message-correct">Correct!</div>
+            <div class="message-error hidden" id="message-error">Wrong.</div>
+            <div class="message" id="message">Choose settings and press «Start game»</div>
+        </div>
+        <div class="score-field">
+            <div id="score">Score: </div>
+            <div id="score-points" class="score-points">0</div>
+        </div>
+    </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
