@@ -136,8 +136,7 @@ function show_game_over(text) {
     document.getElementById('result-total').textContent = score;
     const target = text.split(':').pop();
     console.log(target);
-    document.getElementById('result-answer').textContent = `Last targe city was: ${target}`;
-
+    document.getElementById('result-answer').textContent = `Last target city was: ${target}`;
     const element = document.getElementById(start_button);
     element.textContent = 'Stat Game'; 
     element.id = 'start-game-button'; 
